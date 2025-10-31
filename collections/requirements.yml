@@ -1,0 +1,9 @@
+collections:
+  - name: junipernetworks.junos
+    version: 11.0.0
+  - name: cisco.ios
+    version: 11.1.1
+  - name: cisco.iosxr
+    version: 12.1.0
+  - name: cisco.nxos
+    version: 11.0.0
