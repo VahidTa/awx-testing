@@ -1,0 +1,43 @@
+---
+- name: Retrieve IOS-XR version
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Get IOS facts
+      cisco.ios.ios_facts:
+        gather_subset: interfaces
+      register: ios_version
+      when: ansible_network_os == 'cisco.ios.ios'
+    
+    - name: Get SRX facts
+      junipernetworks.junos.junos_facts:
+        config_format: json
+        gather_subset: interfaces
+      register: junos_version
+      when: ansible_network_os == 'junos'
+    
+
+    - name: Build list of name and operstatus
+      set_fact:
+        interfaces_status: []
+    - name: Append cisco each interface
+      set_fact:
+        interfaces_status: "{{ interfaces_status + [ {'name': item.key, 'operstatus': item.value.operstatus, 'mtu': item.value.mtu, 'speed': item.value.bandwidth} ] }}"
+      loop: "{{ ios_version.ansible_facts.ansible_net_interfaces | dict2items }}"
+      when: ansible_network_os == 'cisco.ios.ios'
+
+    - name: Save JSON to file
+      copy:
+        content: "{{ interfaces_status | to_nice_json }}"
+        dest: "./iosxr_interfaces_operstatus-{{ ios_version.ansible_facts.ansible_net_hostname }}.json"
+      when: ansible_network_os == 'cisco.ios.ios'
+    - name: Append srx each interface
+      set_fact:
+        interfaces_status: "{{ interfaces_status + [ {'name': item.key, 'operstatus': item.value['oper-status'], 'mtu': item.value.mtu, 'speed': item.value.speed} ] }}"
+      loop: "{{ junos_version.ansible_facts.ansible_net_interfaces | dict2items }}"
+      when: ansible_network_os == 'junos'
+    - name: Save JSON to file
+      copy:
+        content: "{{ interfaces_status | to_nice_json }}"
+        dest: "./srx_interfaces_operstatus-{{ junos_version.ansible_facts.ansible_net_hostname }}.json"
+      when: ansible_network_os == 'junos'
