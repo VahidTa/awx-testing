@@ -1,6 +1,6 @@
 ---
 - name: Retrieve IOS-XR version
-  hosts: all
+  hosts: "{{ target_hosts | default('all') }}"
   gather_facts: no
   tasks:
     - name: Get IOS facts
