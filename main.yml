@@ -25,19 +25,26 @@
         interfaces_status: "{{ interfaces_status + [ {'name': item.key, 'operstatus': item.value.operstatus, 'mtu': item.value.mtu, 'speed': item.value.bandwidth} ] }}"
       loop: "{{ ios_version.ansible_facts.ansible_net_interfaces | dict2items }}"
       when: ansible_network_os == 'cisco.ios.ios'
+    
+    - name: post to workflow
+      ansible.builtin.uri:
+        url: http://localhost:5678/webhook-test/b2a3b9aa-530c-48b4-9f8a-c67ff9abfe22
+        method: POST
+        body:
+          data: {{ interfaces_status }}
 
-    - name: Save JSON to file
-      copy:
-        content: "{{ interfaces_status | to_nice_json }}"
-        dest: "./iosxr_interfaces_operstatus-{{ ios_version.ansible_facts.ansible_net_hostname }}.json"
-      when: ansible_network_os == 'cisco.ios.ios'
-    - name: Append srx each interface
-      set_fact:
-        interfaces_status: "{{ interfaces_status + [ {'name': item.key, 'operstatus': item.value['oper-status'], 'mtu': item.value.mtu, 'speed': item.value.speed} ] }}"
-      loop: "{{ junos_version.ansible_facts.ansible_net_interfaces | dict2items }}"
-      when: ansible_network_os == 'junos'
-    - name: Save JSON to file
-      copy:
-        content: "{{ interfaces_status | to_nice_json }}"
-        dest: "./srx_interfaces_operstatus-{{ junos_version.ansible_facts.ansible_net_hostname }}.json"
-      when: ansible_network_os == 'junos'
+    # - name: Save JSON to file
+    #   copy:
+    #     content: "{{ interfaces_status | to_nice_json }}"
+    #     dest: "./iosxr_interfaces_operstatus-{{ ios_version.ansible_facts.ansible_net_hostname }}.json"
+    #   when: ansible_network_os == 'cisco.ios.ios'
+    # - name: Append srx each interface
+    #   set_fact:
+    #     interfaces_status: "{{ interfaces_status + [ {'name': item.key, 'operstatus': item.value['oper-status'], 'mtu': item.value.mtu, 'speed': item.value.speed} ] }}"
+    #   loop: "{{ junos_version.ansible_facts.ansible_net_interfaces | dict2items }}"
+    #   when: ansible_network_os == 'junos'
+    # - name: Save JSON to file
+    #   copy:
+    #     content: "{{ interfaces_status | to_nice_json }}"
+    #     dest: "./srx_interfaces_operstatus-{{ junos_version.ansible_facts.ansible_net_hostname }}.json"
+    #   when: ansible_network_os == 'junos'
