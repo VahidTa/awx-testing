@@ -30,6 +30,7 @@
       ansible.builtin.uri:
         url: http://10.77.31.110:5678/webhook-test/b2a3b9aa-530c-48b4-9f8a-c67ff9abfe22
         method: POST
+        body_format: json
         body:
           data: "{{ interfaces_status | to_nice_json }}"
 
