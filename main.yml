@@ -28,7 +28,7 @@
     
     - name: post to workflow
       ansible.builtin.uri:
-        url: http://10.77.31.110:5678/webhook-test/{{ resume_url }}
+        url: "{{ resume_url | replace("localhost", n8n) }}"
         method: POST
         body_format: json
         body:
