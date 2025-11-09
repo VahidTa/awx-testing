@@ -28,7 +28,7 @@
     
     - name: post to workflow
       ansible.builtin.uri:
-        url: "{{ resume_url | replace("localhost", "10.77.31.110") }}"
+        url: "{{ resume_url | replace('localhost', n8n) }}"
         method: POST
         body_format: json
         body:
